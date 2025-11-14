@@ -59,8 +59,9 @@
 - [x] Add logout functionality
 
 ## Testing & Deployment
-- [ ] Test all pages and functionality
-- [ ] Test admin panel features
-- [ ] Test music player
-- [ ] Test authentication flows
+- [x] Test all pages and functionality
+- [x] Test admin panel features
+- [x] Test music player
+- [x] Test authentication flows
+- [x] Fix login redirect to admin panel after OAuth
 - [ ] Create checkpoint for deployment
