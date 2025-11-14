@@ -2,12 +2,31 @@ import Navigation from "@/components/Navigation";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { Link } from "wouter";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Play } from "lucide-react";
+import { useMusicPlayer, type PlaylistTrack } from "@/components/MusicPlayer";
 
 export default function Releases() {
   const { data: releases, isLoading } = trpc.releases.getAll.useQuery();
-  const { data: tracksMap } = trpc.tracks.getByReleaseId.useQuery(0);
+  const { data: allTracks } = trpc.tracks.getAll.useQuery();
+  const { playTrack } = useMusicPlayer();
   const [expandedRelease, setExpandedRelease] = useState<number | null>(null);
+
+  const playReleaseAudio = (release: any) => {
+    if (!release.audioPreviewUrl) return;
+
+    const track: PlaylistTrack = {
+      id: `release-${release.id}`,
+      title: release.title,
+      artist: release.artist,
+      url: release.audioPreviewUrl,
+    };
+
+    playTrack(track);
+  };
+
+  const getReleaseTracksCount = (releaseId: number): number => {
+    return allTracks?.filter((t: any) => t.releaseId === releaseId).length || 0;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -105,15 +124,27 @@ export default function Releases() {
                         )}
                       </div>
 
-                      {/* Expand Tracks Button */}
-                      <button
-                        onClick={() =>
-                          setExpandedRelease(expandedRelease === release.id ? null : release.id)
-                        }
-                        className="text-sm text-accent hover:underline"
-                      >
-                        {expandedRelease === release.id ? "Hide Tracks" : "Show Tracks"}
-                      </button>
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-3 pt-2">
+                        {release.audioPreviewUrl && (
+                          <button
+                            onClick={() => playReleaseAudio(release)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium"
+                          >
+                            <Play className="w-4 h-4" /> Play Preview
+                          </button>
+                        )}
+                        {getReleaseTracksCount(release.id) > 0 && (
+                          <button
+                            onClick={() =>
+                              setExpandedRelease(expandedRelease === release.id ? null : release.id)
+                            }
+                            className="text-sm text-accent hover:underline"
+                          >
+                            {expandedRelease === release.id ? "Hide Tracks" : `Show Tracks (${getReleaseTracksCount(release.id)})`}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -122,8 +153,21 @@ export default function Releases() {
                     <div className="border-t border-border px-6 py-4 bg-muted/50">
                       <h3 className="font-bold mb-4">Tracklist</h3>
                       <div className="space-y-2">
-                        {/* Placeholder for tracks - will be populated by admin */}
-                        <p className="text-sm text-muted-foreground">Tracks will appear here</p>
+                        {allTracks && allTracks.filter((t: any) => t.releaseId === release.id).length > 0 ? (
+                          allTracks
+                            .filter((t: any) => t.releaseId === release.id)
+                            .sort((a: any, b: any) => a.trackNumber - b.trackNumber)
+                            .map((track: any) => (
+                              <div key={track.id} className="flex items-center justify-between p-3 bg-background rounded">
+                                <div className="flex-1">
+                                  <p className="font-medium">#{track.trackNumber} {track.title}</p>
+                                  <p className="text-sm text-muted-foreground">{track.artist} • {track.length}</p>
+                                </div>
+                              </div>
+                            ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">No tracks added yet</p>
+                        )}
                       </div>
                     </div>
                   )}

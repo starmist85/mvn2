@@ -9,7 +9,7 @@ import About from "./pages/About";
 import Releases from "./pages/Releases";
 import News from "./pages/News";
 import Admin from "./pages/Admin";
-import MusicPlayer from "./components/MusicPlayer";
+import { MusicPlayerProvider } from "./components/MusicPlayer";
 
 function Router() {
   return (
@@ -32,10 +32,11 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <div className="flex flex-col min-h-screen bg-background text-foreground">
-            <Router />
-            <MusicPlayer />
-          </div>
+          <MusicPlayerProvider>
+            <div className="flex flex-col min-h-screen bg-background text-foreground">
+              <Router />
+            </div>
+          </MusicPlayerProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

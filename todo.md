@@ -40,7 +40,10 @@
 - [x] Create static bottom footer music player
 - [x] Implement player controls (play, pause, next, prev)
 - [x] Implement waveform audio visualization
-- [ ] Connect player to release audio previews
+- [x] Connect player to release audio previews
+- [x] Display releases with audio files as playable tracks
+- [x] Add audio-link property to release data
+- [x] Integrate release audio with music player
 
 ## Assets & Styling
 - [x] Add logo to project

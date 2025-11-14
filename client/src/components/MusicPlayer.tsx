@@ -1,8 +1,86 @@
-import { useState, useRef, useEffect } from "react";
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { useState, useRef, useEffect, createContext, useContext } from "react";
 
-export default function MusicPlayer() {
+export interface PlaylistTrack {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+}
+
+interface MusicPlayerContextType {
+  currentTrack: PlaylistTrack | null;
+  isPlaying: boolean;
+  playlist: PlaylistTrack[];
+  playTrack: (track: PlaylistTrack) => void;
+  setPlaylist: (tracks: PlaylistTrack[]) => void;
+  togglePlayPause: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
+}
+
+const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
+
+export function useMusicPlayer() {
+  const context = useContext(MusicPlayerContext);
+  if (!context) {
+    throw new Error("useMusicPlayer must be used within MusicPlayerProvider");
+  }
+  return context;
+}
+
+export function MusicPlayerProvider({ children }: { children: React.ReactNode }) {
+  const [currentTrack, setCurrentTrack] = useState<PlaylistTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playlist, setPlaylist] = useState<PlaylistTrack[]>([]);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
+  const playTrack = (track: PlaylistTrack) => {
+    setCurrentTrack(track);
+    setIsPlaying(true);
+  };
+
+  const togglePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const nextTrack = () => {
+    if (playlist.length === 0) return;
+    const nextIndex = (currentTrackIndex + 1) % playlist.length;
+    setCurrentTrackIndex(nextIndex);
+    setCurrentTrack(playlist[nextIndex]);
+    setIsPlaying(true);
+  };
+
+  const prevTrack = () => {
+    if (playlist.length === 0) return;
+    const prevIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+    setCurrentTrackIndex(prevIndex);
+    setCurrentTrack(playlist[prevIndex]);
+    setIsPlaying(true);
+  };
+
+  return (
+    <MusicPlayerContext.Provider
+      value={{
+        currentTrack,
+        isPlaying,
+        playlist,
+        playTrack,
+        setPlaylist,
+        togglePlayPause,
+        nextTrack,
+        prevTrack,
+      }}
+    >
+      {children}
+      <MusicPlayer />
+    </MusicPlayerContext.Provider>
+  );
+}
+
+function MusicPlayer() {
+  const { currentTrack, isPlaying, togglePlayPause, nextTrack, prevTrack } = useMusicPlayer();
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
@@ -10,19 +88,18 @@ export default function MusicPlayer() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
 
-  // Dummy audio URL - replace with actual audio
-  const audioUrl = "/sample-audio.mp3";
+  // Play/pause effect
+  useEffect(() => {
+    if (!audioRef.current || !currentTrack) return;
 
-  const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    if (isPlaying) {
+      audioRef.current.play().catch(() => {
+        // Autoplay might be blocked
+      });
+    } else {
+      audioRef.current.pause();
     }
-  };
+  }, [isPlaying, currentTrack]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -100,17 +177,27 @@ export default function MusicPlayer() {
     };
   }, [currentTime, duration]);
 
+  if (!currentTrack) {
+    return null;
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-2xl z-40">
       <audio
         ref={audioRef}
-        src={audioUrl}
+        src={currentTrack.url}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={nextTrack}
       />
 
       <div className="container mx-auto px-4 py-4">
+        {/* Track Info */}
+        <div className="mb-3 text-sm">
+          <p className="font-medium truncate">{currentTrack.title}</p>
+          <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
+        </div>
+
         {/* Waveform Display */}
         <div className="mb-3 rounded bg-black/50 overflow-hidden">
           <canvas
@@ -142,7 +229,10 @@ export default function MusicPlayer() {
         {/* Controls */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-muted rounded transition-colors">
+            <button
+              onClick={prevTrack}
+              className="p-2 hover:bg-muted rounded transition-colors"
+            >
               <SkipBack className="w-5 h-5" />
             </button>
 
@@ -157,7 +247,10 @@ export default function MusicPlayer() {
               )}
             </button>
 
-            <button className="p-2 hover:bg-muted rounded transition-colors">
+            <button
+              onClick={nextTrack}
+              className="p-2 hover:bg-muted rounded transition-colors"
+            >
               <SkipForward className="w-5 h-5" />
             </button>
           </div>
