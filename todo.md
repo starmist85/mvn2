@@ -27,8 +27,14 @@
 - [x] Build admin dashboard layout
 - [x] Implement release management interface
 - [x] Implement track adding/removal for releases
-- [ ] Implement file upload for release images and audio
+- [x] Implement file upload for release images and audio
 - [x] Implement news management interface with publish date, full text, excerpt, image upload, and title
+
+## File Upload Features
+- [x] Create file upload component with S3 integration
+- [x] Implement release picture upload with preview
+- [x] Implement release audio upload with preview
+- [x] Add file validation and error handling
 
 ## Music Player
 - [x] Create static bottom footer music player

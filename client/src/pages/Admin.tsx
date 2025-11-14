@@ -1,5 +1,5 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X, Plus, Upload, ChevronDown, ChevronUp } from "lucide-react";
 import { useLocation } from "wouter";
 import Navigation from "@/components/Navigation";
+import FileUpload from "@/components/FileUpload";
 import { toast } from "sonner";
 
 const RELEASE_FORMATS = [
@@ -223,22 +224,21 @@ function ReleaseManager() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Release Image URL</label>
-              <Input
-                placeholder="https://example.com/image.jpg"
-                value={formData.imageUrl}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Audio Preview URL</label>
-              <Input
-                placeholder="https://example.com/preview.mp3"
-                value={formData.audioPreviewUrl}
-                onChange={(e) => setFormData({ ...formData, audioPreviewUrl: e.target.value })}
-              />
-            </div>
+            <FileUpload
+              fileType="image"
+              label="Release Cover Image"
+              currentUrl={formData.imageUrl}
+              onUploadComplete={(url) => setFormData({ ...formData, imageUrl: url })}
+            />
+            <FileUpload
+              fileType="audio"
+              label="Audio Preview"
+              currentUrl={formData.audioPreviewUrl}
+              onUploadComplete={(url) => setFormData({ ...formData, audioPreviewUrl: url })}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">YouTube Link</label>
               <Input

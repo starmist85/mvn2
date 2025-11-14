@@ -2,11 +2,13 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import multer from "multer";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { handleFileUpload } from "./uploadHandler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -33,8 +35,17 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  // Configure multer for file uploads
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 50 * 1024 * 1024 },
+  });
+
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // File upload endpoint
+  app.post("/api/upload", upload.single("file"), handleFileUpload);
   // tRPC API
   app.use(
     "/api/trpc",
