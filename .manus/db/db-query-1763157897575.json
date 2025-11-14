@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, openId, name, email, role, createdAt, lastSignedIn FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 35R1ukti6yTygoT.root --database UcksyuAZNJ4A77ux4ZWMe6 --execute SELECT id, openId, name, email, role, createdAt, lastSignedIn FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "eZaU6p6uWjDwdydQZZgarc",
+      "name": "Starmist",
+      "email": "djstarmist@gmail.com",
+      "role": "admin",
+      "createdAt": "2025-11-14 21:37:29",
+      "lastSignedIn": "2025-11-14 22:04:05"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\trole\tcreatedAt\tlastSignedIn\n1\teZaU6p6uWjDwdydQZZgarc\tStarmist\tdjstarmist@gmail.com\tadmin\t2025-11-14 21:37:29\t2025-11-14 22:04:05\n",
+  "stderr": "",
+  "execution_time_ms": 651
+}

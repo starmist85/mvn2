@@ -65,4 +65,5 @@
 - [x] Test authentication flows
 - [x] Fix login redirect to admin panel after OAuth
 - [x] Fix Admin component state update during render error
+- [x] Debug OAuth login error - simplified login flow to use direct OAuth URL
 - [ ] Create checkpoint for deployment
