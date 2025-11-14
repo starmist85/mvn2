@@ -26,7 +26,7 @@
 - [x] Create admin authentication check
 - [x] Build admin dashboard layout
 - [x] Implement release management interface
-- [ ] Implement track adding/removal for releases
+- [x] Implement track adding/removal for releases
 - [ ] Implement file upload for release images and audio
 - [x] Implement news management interface with publish date, full text, excerpt, image upload, and title
 

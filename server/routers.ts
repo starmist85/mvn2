@@ -1,4 +1,5 @@
 import { COOKIE_NAME } from "@shared/const";
+import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -89,6 +90,10 @@ export const appRouter = router({
   }),
 
   tracks: router({
+    getAll: publicProcedure.query(async () => {
+      const { getAllTracks } = await import("./db");
+      return await getAllTracks();
+    }),
     getByReleaseId: publicProcedure.input(z.number()).query(async ({ input }) => {
       const { getTracksByReleaseId } = await import("./db");
       return await getTracksByReleaseId(input);

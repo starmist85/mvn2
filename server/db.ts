@@ -130,6 +130,12 @@ export async function deleteRelease(id: number) {
 }
 
 // Track queries
+export async function getAllTracks() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(tracks).orderBy(tracks.releaseId, tracks.trackNumber);
+}
+
 export async function getTracksByReleaseId(releaseId: number) {
   const db = await getDb();
   if (!db) return [];
