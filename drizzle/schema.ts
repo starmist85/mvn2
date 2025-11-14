@@ -25,4 +25,67 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Releases table for music label albums and singles
+ */
+export const releases = mysqlTable("releases", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  artist: varchar("artist", { length: 255 }).notNull(),
+  releaseDate: timestamp("releaseDate").notNull(),
+  description: text("description"),
+  format: mysqlEnum("format", [
+    "Digital Album",
+    "Digital Single",
+    "Digital USB Stick",
+    "CD Single",
+    "CD Album",
+    "Vinyl Album",
+    "Vinyl Single",
+    "Cassette"
+  ]).notNull(),
+  imageUrl: text("imageUrl"),
+  audioPreviewUrl: text("audioPreviewUrl"),
+  youtubeLink: text("youtubeLink"),
+  spotifyLink: text("spotifyLink"),
+  appleMusicLink: text("appleMusicLink"),
+  storeLink: text("storeLink"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Release = typeof releases.$inferSelect;
+export type InsertRelease = typeof releases.$inferInsert;
+
+/**
+ * Tracks table for individual songs in releases
+ */
+export const tracks = mysqlTable("tracks", {
+  id: int("id").autoincrement().primaryKey(),
+  releaseId: int("releaseId").notNull(),
+  trackNumber: int("trackNumber").notNull(),
+  artist: varchar("artist", { length: 255 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  length: varchar("length", { length: 10 }).notNull(), // Format: MM:SS
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Track = typeof tracks.$inferSelect;
+export type InsertTrack = typeof tracks.$inferInsert;
+
+/**
+ * News table for label news and announcements
+ */
+export const news = mysqlTable("news", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  excerpt: text("excerpt"),
+  content: text("content").notNull(),
+  imageUrl: text("imageUrl"),
+  publishedAt: timestamp("publishedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type News = typeof news.$inferSelect;
+export type InsertNews = typeof news.$inferInsert;
