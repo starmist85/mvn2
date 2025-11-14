@@ -3,6 +3,7 @@ import { X, Mail, Lock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
+import { getLoginUrl } from "@/const";
 
 type LoginStep = "login" | "forgot-password" | "reset-password";
 
@@ -23,20 +24,10 @@ export default function LoginModal({ onClose }: LoginModalProps) {
 
   // Note: These mutations would need to be implemented in your backend
   // For now, we'll show the UI structure
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      // This would call your actual login endpoint
-      // For now, we'll show a message
-      setError("Admin login is handled through the Manus OAuth system. Please use the admin panel.");
-    } catch (err) {
-      setError("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    // Redirect to Manus OAuth login
+    window.location.href = getLoginUrl();
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -160,25 +151,12 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+              <Button type="submit" className="w-full">
+                Login with Manus OAuth
               </Button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setStep("forgot-password");
-                  setError("");
-                  setEmail("");
-                  setPassword("");
-                }}
-                className="w-full text-sm text-accent hover:underline text-center"
-              >
-                Forgot Password?
-              </button>
-
               <p className="text-xs text-muted-foreground text-center">
-                Note: Admin access is managed through the Manus OAuth system. Contact your administrator for access.
+                You will be redirected to the Manus login portal. Use your Manus account credentials to log in.
               </p>
             </form>
           )}
@@ -187,26 +165,14 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           {step === "forgot-password" && (
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Enter your email address and we will send you a link to reset your password.
+                Password reset is managed through your Manus account. Please visit the Manus portal to reset your password.
               </p>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="email"
-                    placeholder="admin@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send Reset Link"}
+              <Button 
+                onClick={() => window.open(import.meta.env.VITE_OAUTH_PORTAL_URL, '_blank')}
+                className="w-full"
+              >
+                Go to Manus Portal
               </Button>
 
               <button
@@ -214,7 +180,6 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                 onClick={() => {
                   setStep("login");
                   setError("");
-                  setEmail("");
                 }}
                 className="w-full flex items-center justify-center gap-2 text-sm text-accent hover:underline"
               >
@@ -224,74 +189,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             </form>
           )}
 
-          {/* Reset Password Form */}
-          {step === "reset-password" && (
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Enter the reset code from your email and your new password.
-              </p>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Reset Code</label>
-                <Input
-                  type="text"
-                  placeholder="Enter reset code"
-                  value={resetCode}
-                  onChange={(e) => setResetCode(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">New Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Confirm Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Resetting..." : "Reset Password"}
-              </Button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setStep("forgot-password");
-                  setError("");
-                  setResetCode("");
-                  setNewPassword("");
-                  setConfirmPassword("");
-                }}
-                className="w-full flex items-center justify-center gap-2 text-sm text-accent hover:underline"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </button>
-            </form>
-          )}
         </div>
       </div>
     </div>
