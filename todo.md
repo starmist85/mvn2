@@ -31,6 +31,9 @@
 ## Phase 5: WampServer Deployment
 - [x] Create .htaccess for Apache URL rewriting
 - [x] Create index.html entry point
+- [x] Fix main.tsx module loading error
+- [x] Create comprehensive deployment guide
+- [ ] Build React app for production (npm run build)
 - [ ] Configure Apache virtual host for mvn2
 - [ ] Set up database in WampServer MySQL
 - [ ] Deploy files to WampServer www directory

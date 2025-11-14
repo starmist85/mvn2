@@ -4,56 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MegaVibeNetwork - Music Label</title>
-    <link rel="icon" type="image/svg+xml" href="/logo.png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #0a0e27;
-            color: #ffffff;
-            line-height: 1.6;
-        }
-
-        #root {
-            min-height: 100vh;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-size: 1.2rem;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #00d4ff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <!-- This file is for development only. For production, use the built files from dist/public/ -->
 </head>
 <body>
-    <div id="root">
-        <div class="loading">
-            <div class="spinner"></div>
-            <span>Loading MegaVibeNetwork...</span>
-        </div>
-    </div>
+    <div id="root"></div>
+    <!-- 
+        For WampServer deployment:
+        1. Run: npm run build
+        2. Copy dist/public/* to the root directory
+        3. The built files will include the proper index.html with all dependencies bundled
+    -->
     <script type="module" src="/client/src/main.tsx"></script>
 </body>
 </html>
