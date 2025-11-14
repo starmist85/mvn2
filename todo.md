@@ -64,4 +64,5 @@
 - [x] Test music player
 - [x] Test authentication flows
 - [x] Fix login redirect to admin panel after OAuth
+- [x] Fix Admin component state update during render error
 - [ ] Create checkpoint for deployment

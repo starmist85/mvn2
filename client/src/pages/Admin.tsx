@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,11 +28,12 @@ export default function Admin() {
   const { user, loading } = useAuth();
   const [, navigate] = useLocation();
 
-  // Redirect if not admin
-  if (!loading && (!user || user.role !== "admin")) {
-    navigate("/");
-    return null;
-  }
+  // Redirect if not admin using useEffect to avoid render-time state updates
+  useEffect(() => {
+    if (!loading && (!user || user.role !== "admin")) {
+      navigate("/");
+    }
+  }, [loading, user, navigate]);
 
   if (loading) {
     return (
@@ -40,6 +41,10 @@ export default function Admin() {
         <p className="text-muted-foreground">Loading...</p>
       </div>
     );
+  }
+
+  if (!user || user.role !== "admin") {
+    return null;
   }
 
   return (
