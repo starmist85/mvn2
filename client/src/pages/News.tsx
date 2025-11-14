@@ -1,9 +1,37 @@
 import Navigation from "@/components/Navigation";
-import { trpc } from "@/lib/trpc";
+import { newsAPI } from "@/lib/api";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 
+interface NewsArticle {
+  id: number;
+  title: string;
+  excerpt: string;
+  content: string;
+  imageUrl?: string;
+  publishDate: string;
+}
+
 export default function News() {
-  const { data: news, isLoading } = trpc.news.getAll.useQuery();
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch news articles
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setIsLoading(true);
+        const articles = await newsAPI.getAll();
+        setNews(articles as NewsArticle[]);
+      } catch (error) {
+        console.error("Failed to fetch news:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,7 +68,7 @@ export default function News() {
                     <div className="mb-4">
                       <h2 className="text-3xl font-bold mb-2">{article.title}</h2>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(article.publishedAt).toLocaleDateString("en-US", {
+                        {new Date(article.publishDate).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",

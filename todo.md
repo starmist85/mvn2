@@ -21,11 +21,12 @@
 - [x] Implement file validation and storage
 
 ## Phase 4: React Frontend Updates
-- [ ] Update API calls to use PHP endpoints instead of tRPC
-- [ ] Update authentication flow for PHP backend
-- [ ] Test all pages with PHP API
+- [x] Update Home page to use PHP API
+- [x] Update Releases page to use PHP API
+- [x] Update News page to use PHP API
+- [x] Update Admin panel to use PHP API
+- [x] Update FileUpload component for PHP backend
 - [ ] Build React app for production
-- [ ] Create config file for API base URL
 
 ## Phase 5: WampServer Deployment
 - [x] Create .htaccess for Apache URL rewriting

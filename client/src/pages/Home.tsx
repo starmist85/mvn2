@@ -1,18 +1,45 @@
-import { trpc } from "@/lib/trpc";
 import Navigation from "@/components/Navigation";
 import { useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { Link } from "wouter";
+import { releasesAPI } from "@/lib/api";
+
+interface Release {
+  id: number;
+  title: string;
+  artist: string;
+  format: string;
+  imageUrl?: string;
+  releaseDate: string;
+}
 
 export default function Home() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [latestReleases, setLatestReleases] = useState<Release[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const banners = [
     "/banners/banner1.png",
     "/banners/banner2.png",
     "/banners/banner3.png",
   ];
 
-  const { data: latestReleases } = trpc.releases.getLatest.useQuery(5);
+  // Fetch latest releases
+  useEffect(() => {
+    const fetchReleases = async () => {
+      try {
+        setLoading(true);
+        const releases = await releasesAPI.getLatest(5);
+        setLatestReleases(releases as Release[]);
+      } catch (error) {
+        console.error("Failed to fetch releases:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReleases();
+  }, []);
 
   // Banner slider animation
   useEffect(() => {
@@ -63,36 +90,42 @@ export default function Home() {
       <section className="py-16 px-4">
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">Latest Releases</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {latestReleases?.map((release) => (
-              <Link
-                key={release.id}
-                href={`/releases#release-${release.id}`}
-                className="group cursor-pointer"
-              >
-                <div className="bg-card rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="relative w-full aspect-square bg-muted overflow-hidden">
-                    {release.imageUrl ? (
-                      <img
-                        src={release.imageUrl}
-                        alt={release.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/20 to-accent/5">
-                        <span className="text-muted-foreground">No Image</span>
-                      </div>
-                    )}
+          {loading ? (
+            <div className="text-center text-muted-foreground">Loading releases...</div>
+          ) : latestReleases.length === 0 ? (
+            <div className="text-center text-muted-foreground">No releases available yet.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {latestReleases.map((release) => (
+                <Link
+                  key={release.id}
+                  href={`/releases#release-${release.id}`}
+                  className="group cursor-pointer"
+                >
+                  <div className="bg-card rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                    <div className="relative w-full aspect-square bg-muted overflow-hidden">
+                      {release.imageUrl ? (
+                        <img
+                          src={release.imageUrl}
+                          alt={release.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/20 to-accent/5">
+                          <span className="text-muted-foreground">No Image</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-sm line-clamp-2 mb-1">{release.title}</h3>
+                      <p className="text-xs text-muted-foreground mb-2">{release.artist}</p>
+                      <p className="text-xs text-muted-foreground">{release.format}</p>
+                    </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-sm line-clamp-2 mb-1">{release.title}</h3>
-                    <p className="text-xs text-muted-foreground mb-2">{release.artist}</p>
-                    <p className="text-xs text-muted-foreground">{release.format}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

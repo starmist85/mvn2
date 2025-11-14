@@ -1,17 +1,63 @@
 import Navigation from "@/components/Navigation";
-import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { releasesAPI, tracksAPI } from "@/lib/api";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { ExternalLink, Play } from "lucide-react";
 import { useMusicPlayer, type PlaylistTrack } from "@/components/MusicPlayer";
 
+interface Release {
+  id: number;
+  title: string;
+  artist: string;
+  format: string;
+  description?: string;
+  imageUrl?: string;
+  audioPreviewUrl?: string;
+  releaseDate: string;
+  spotifyLink?: string;
+  appleMusicLink?: string;
+  youtubeLink?: string;
+  storeLink?: string;
+}
+
+interface Track {
+  id: number;
+  releaseId: number;
+  trackNumber: number;
+  title: string;
+  artist: string;
+  length: string;
+}
+
 export default function Releases() {
-  const { data: releases, isLoading } = trpc.releases.getAll.useQuery();
-  const { data: allTracks } = trpc.tracks.getAll.useQuery();
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [allTracks, setAllTracks] = useState<Track[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { playTrack } = useMusicPlayer();
   const [expandedRelease, setExpandedRelease] = useState<number | null>(null);
 
-  const playReleaseAudio = (release: any) => {
+  // Fetch releases and tracks
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [releasesData, tracksData] = await Promise.all([
+          releasesAPI.getAll(),
+          tracksAPI.getAll(),
+        ]);
+        setReleases(releasesData as Release[]);
+        setAllTracks(tracksData as Track[]);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const playReleaseAudio = (release: Release) => {
     if (!release.audioPreviewUrl) return;
 
     const track: PlaylistTrack = {
@@ -25,7 +71,7 @@ export default function Releases() {
   };
 
   const getReleaseTracksCount = (releaseId: number): number => {
-    return allTracks?.filter((t: any) => t.releaseId === releaseId).length || 0;
+    return allTracks.filter((t) => t.releaseId === releaseId).length;
   };
 
   return (
@@ -153,11 +199,11 @@ export default function Releases() {
                     <div className="border-t border-border px-6 py-4 bg-muted/50">
                       <h3 className="font-bold mb-4">Tracklist</h3>
                       <div className="space-y-2">
-                        {allTracks && allTracks.filter((t: any) => t.releaseId === release.id).length > 0 ? (
+                        {allTracks.filter((t) => t.releaseId === release.id).length > 0 ? (
                           allTracks
-                            .filter((t: any) => t.releaseId === release.id)
-                            .sort((a: any, b: any) => a.trackNumber - b.trackNumber)
-                            .map((track: any) => (
+                            .filter((t) => t.releaseId === release.id)
+                            .sort((a, b) => a.trackNumber - b.trackNumber)
+                            .map((track) => (
                               <div key={track.id} className="flex items-center justify-between p-3 bg-background rounded">
                                 <div className="flex-1">
                                   <p className="font-medium">#{track.trackNumber} {track.title}</p>
